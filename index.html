@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Acronym Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db; /* Soft Blue */
+            --secondary-color: #8f9195;
+            --background-color: #1e272e; /* Dark background */
+            --card-background: #2f3640; /* Slightly lighter for cards */
+            --text-color: #f5f6fa; /* Light text color */
+            --correct-color: #2ecc71; /* Green for correct answers */
+            --incorrect-color: #e74c3c; /* Red for incorrect answers */
+            --gradient-background: linear-gradient(145deg, #226592, #2aa098);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); /* Subtle texture */
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .game-container {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            background: -webkit-linear-gradient(#3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        h3 {
+            font-size: 2.2em;
+            margin: 20px 0;
+            color: var(--primary-color);
+        }
+
+        .button {
+            display: inline-block;
+            padding: 15px 15px;
+            margin: 10px 0;
+            background: var(--gradient-background);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+	font-weight:bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+height:60px;
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+        }
+
+.hint {
+    background-color: #2d3436;
+    border: 1px solid #636e72;
+    border-radius: 10px;
+    padding: 10px;
+    color: #dfe6e9;
+    margin-bottom: 20px;
+margin-top:20px;
+    position: relative;
+}
+
+.hint-toggle {
+    background: none;
+    border: none;
+    color: #dfe6e9;
+    font-size: 1.1em;
+    cursor: pointer;
+    margin-left: 10px;
+    outline: none;
+    vertical-align: middle;
+}
+
+.hint-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.hint-content {
+    margin-top: 10px;
+}
+
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .correct {
+            background-color: var(--correct-color);
+            color: white;
+        }
+
+        .incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #4b4b4b;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .progress-fill {
+            animation: fillProgress 0.8s forwards;
+        }
+
+        @keyframes fillProgress {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        .domain-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container" class="game-container"></div>
+
+    <script>
+        const acronyms = [
+            { initials: 'XDR', full: 'Extended Detection and Response', hint: 'The XDR technology provides broader threat detection and response capabilities.',
+              wrongOptions: ['X-ray Data Recovery', 'External Defense Reinforcement', 'Cross-Domain Resolution'], domain: 'Tool' },
+            { initials: 'DDOS', full: 'Distributed Denial of Service', hint: 'A DDOS attack aims to overwhelm a system with traffic from multiple sources.',
+              wrongOptions: ['Data Driven Operating System', 'Digital Defense Optimization Strategy', 'Decentralized Data Obfuscation Service'], domain: 'Term' },
+            { initials: 'DLP', full: 'Data Loss Prevention', hint: 'DLP strategy helps prevent sensitive data from leaving an organization.',
+              wrongOptions: ['Dynamic Logging Protocol', 'Digital Liability Protection', 'Distributed Latency Processing'], domain: 'Tool' },
+            { initials: 'AV', full: 'Anti-Virus', hint: 'The AV software is designed to detect and remove malicious programs.',
+              wrongOptions: ['Access Verification', 'Automated Vetting', 'Application Virtualization'], domain: 'Tool' },
+            { initials: 'IAM', full: 'Identity and Access Management', hint: 'IAM framework manages digital identities and user access to resources.',
+              wrongOptions: ['Intelligence Attack Mitigation', 'Integrated Asset Monitoring', 'Internet Activity Management'], domain: 'Tool' },
+            { initials: 'CTI', full: 'Cyber Threat Intelligence', hint: 'CTI information helps organizations understand and predict cyber threats.',
+              wrongOptions: ['Critical Technology Infrastructure', 'Collaborative Threat Investigation', 'Centralized Trust Index'], domain: 'Term' },
+            { initials: 'TIP', full: 'Threat Intelligence Platform', hint: 'A TIP system collects and analyzes threat data from multiple sources.',
+              wrongOptions: ['Tactical Intrusion Prevention', 'Trusted Identity Protocol', 'Traffic Inspection Point'], domain: 'Tool' },
+            { initials: 'IOC', full: 'Indicator of Compromise', hint: 'An IOC is a piece of forensic data that helps identify potential security breaches.',
+              wrongOptions: ['Internet of Cybersecurity', 'Integrated Operations Center', 'Incident Orchestration Console'], domain: 'Term' },
+            { initials: 'TTP', full: 'Tactics, Techniques, and Procedures', hint: 'TTPs are the specific methods used by threat actors.',
+              wrongOptions: ['Threat Tracking Protocol', 'Trusted Third Party', 'Technical Training Program'], domain: 'Term' },
+            { initials: 'NGFW', full: 'Next-Generation Firewall', hint: 'An NGFW provides additional security features beyond traditional firewalls.',
+              wrongOptions: ['Network Gateway for Web', 'Non-Governmental Firewall', 'Neural Gateway Framework'], domain: 'Tool' },
+            { initials: 'SIEM', full: 'Security Information and Event Management', hint: 'SIEM systems collect and analyze log data from various sources to detect security threats.',
+              wrongOptions: ['Secure Internet Email Management', 'System Integrity Evaluation Mechanism', 'Strategic Incident Escalation Model'], domain: 'Tool' },
+            { initials: 'APT', full: 'Advanced Persistent Threat', hint: 'An APT is a prolonged and targeted cyberattack in which an intruder gains access to a network and remains undetected for an extended period.',
+              wrongOptions: ['Automated Penetration Testing', 'Application Programming Toolkit', 'Asset Protection Technology'], domain: 'Term' },
+            { initials: 'SOAR', full: 'Security Orchestration, Automation and Response', hint: 'SOAR tools help organizations streamline security operations in three key areas: threat and vulnerability management, incident response, and security operations automation.',
+              wrongOptions: ['Secure Online Access Repository', 'System Optimization and Recovery', 'Strategic Operations and Risk'], domain: 'Tool' },
+            { initials: 'EDR', full: 'Endpoint Detection and Response', hint: 'EDR tools continuously monitor and respond to mitigate cyber threats on endpoint devices.',
+              wrongOptions: ['External Data Recovery', 'Enterprise Data Replication', 'Enhanced Disaster Recovery'], domain: 'Tool' },
+            { initials: 'CASB', full: 'Cloud Access Security Broker', hint: 'A CASB is a security policy enforcement point placed between cloud service consumers and cloud service providers.',
+              wrongOptions: ['Centralized Authentication Service Bus', 'Cyber Attack Simulation Base', 'Continuous Application Security Baseline'], domain: 'Tool' }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let questions = [];
+        let incorrectAnswers = [];
+        let domainScores = { 'Tool': { correct: 0, total: 0 }, 'Term': { correct: 0, total: 0 } };
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+function initializeGame() {
+    const shuffledAcronyms = shuffleArray([...acronyms]);
+    questions = shuffledAcronyms.slice(0, 10).map(acronym => ({
+        ...acronym,
+        options: shuffleArray([
+            acronym.full,
+            ...acronym.wrongOptions
+        ])
+    }));
+
+    // Ensure questions are populated
+    if (questions.length === 0) {
+        console.error('No questions available');
+        return;
+    }
+
+    currentQuestion = 0;
+    score = 0;
+    incorrectAnswers = [];
+    domainScores = { 'Tool': { correct: 0, total: 0 }, 'Term': { correct: 0, total: 0 } };
+    renderSplashScreen();
+}
+
+
+        function renderSplashScreen() {
+            const container = document.getElementById('game-container');
+            container.innerHTML = `
+                <h1>Cybersecurity Acronym Game</h1>
+                <p>Test your knowledge of cybersecurity tools and terms!</p>
+                <p>You'll be given 10 random questions about various cybersecurity acronyms.</p>
+                <button id="start-game" class="button">Start Game</button>
+            `;
+            document.getElementById('start-game').addEventListener('click', startGame);
+        }
+
+        function startGame() {
+            renderQuestion();
+        }
+
+function renderQuestion() {
+    if (currentQuestion >= questions.length) {
+        renderSummary();
+        return;
+    }
+
+    const container = document.getElementById('game-container');
+    const question = questions[currentQuestion];
+
+    if (!question) {
+        console.error('Question not found');
+        return;
+    }
+
+    container.innerHTML = `
+        <h2>Question ${currentQuestion + 1} of ${questions.length}</h2>
+        <h3>${question.initials}</h3>
+        <p>A ${question.domain}</p>
+
+
+
+
+
+        <div id="options" class="options-grid"></div>
+
+<div class="hint">
+    <p><strong>💡 Hint </strong> 
+        <button id="hint-toggle" class="hint-toggle">
+           <strong> <i class="fas fa-chevron-down"></i> </strong> <!-- Arrow icon -->
+        </button>
+    </p>
+    <div id="hint-content" class="hint-content" style="display: none;">
+        ${question.hint} <!-- The hint text -->
+    </div>
+</div>
+
+        <div id="feedback"></div>
+    `;
+
+toggleHint();
+    const optionsContainer = document.getElementById('options');
+    question.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.textContent = option;
+        button.className = 'button';
+        button.addEventListener('click', () => handleAnswer(option));
+        optionsContainer.appendChild(button);
+    });
+}
+
+function toggleHint() {
+    const hintToggle = document.getElementById('hint-toggle');
+    const hintContent = document.getElementById('hint-content');
+    const arrowIcon = document.querySelector('#hint-toggle i');
+
+    hintToggle.addEventListener('click', () => {
+        if (hintContent.style.display === 'none') {
+            hintContent.style.display = 'block'; // Show hint
+            arrowIcon.classList.remove('fa-chevron-down');
+            arrowIcon.classList.add('fa-chevron-up'); // Change arrow direction
+        } else {
+            hintContent.style.display = 'none'; // Hide hint
+            arrowIcon.classList.remove('fa-chevron-up');
+            arrowIcon.classList.add('fa-chevron-down'); // Change arrow direction
+        }
+    });
+}
+
+
+        function handleAnswer(selectedAnswer) {
+            const question = questions[currentQuestion];
+            const feedbackContainer = document.getElementById('feedback');
+            const optionButtons = document.querySelectorAll('#options .button');
+            
+            optionButtons.forEach(button => button.disabled = true);
+
+            domainScores[question.domain].total++;
+
+            if (selectedAnswer === question.full) {
+                score++;
+                domainScores[question.domain].correct++;
+                feedbackContainer.innerHTML = `
+                    <div class="feedback correct">
+                        <i class="fas fa-check-circle"></i>
+                        <p>Correct! ${question.initials} stands for ${question.full}.</p>
+                    </div>
+                `;
+            } else {
+                incorrectAnswers.push(question);
+                feedbackContainer.innerHTML = `
+                    <div class="feedback incorrect">
+                        <i class="fas fa-times-circle"></i>
+                        <p>Incorrect. The correct answer is: ${question.full}</p>
+                    </div>
+                `;
+            }
+
+            feedbackContainer.innerHTML += `
+                <button id="next-question" class="button">
+                    ${currentQuestion < 9 ? 'Next Question' : 'Finish Game'}
+                </button>
+            `;
+            document.getElementById('next-question').addEventListener('click', nextQuestion);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < 10) {
+                renderQuestion();
+            } else {
+                renderSummary();
+            }
+        }
+
+        function renderSummary() {
+            const container = document.getElementById('game-container');
+            container.innerHTML = `
+                <h2>Game Summary</h2>
+                <p>Your final score: ${score} out of 10</p>
+                <div class="progress-container">
+                    <h3>Domain Performance</h3>
+                    ${renderProgressBar('Tool')}
+                    ${renderProgressBar('Term')}
+                </div>
+	<div id="incorrect-answers"></div>
+                <button id="restart-game" class="button">Play Again</button>
+            `;
+	const incorrectAnswersContainer = document.getElementById('incorrect-answers');
+            if (incorrectAnswers.length > 0) {
+                incorrectAnswersContainer.innerHTML = `
+                    <h3>Incorrect Answers:</h3>
+                    <ul>
+                        ${incorrectAnswers.map(answer => `
+                            <li>${answer.initials} (${answer.domain}): ${answer.full}</li>
+                        `).join('')}
+                    </ul>
+                `;
+            } else {
+                incorrectAnswersContainer.innerHTML = `
+                    <p>Congratulations! You got all answers correct!</p>
+                `;
+            }
+            document.getElementById('restart-game').addEventListener('click', initializeGame);
+        }
+
+        function renderProgressBar(domain) {
+            const { correct, total } = domainScores[domain];
+            const percentage = total > 0 ? (correct / total) * 100 : 0;
+            return `
+                <div class="domain-label">
+                    <span>${domain}</span>
+                    <span>${correct}/${total}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: ${percentage}%"></div>
+                </div>
+            `;
+        }
+
+        initializeGame();
+    </script>
+</body>
+</html>
